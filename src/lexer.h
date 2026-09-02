@@ -43,14 +43,14 @@ public:
         return regex_match(str, match, std::regex(regex));
     }
     virtual bool finds(smatch& match, const string& str) {
-        return regex_search(str, match, std::regex(regex));
+        return regex_search(str, match, std::regex("^"+regex));
     }
     
     virtual bool matches(smatch& match, const string& str) const {
         return regex_match(str, match, std::regex(regex));
     }
     virtual bool finds(smatch& match, const string& str) const {
-        return regex_search(str, match, std::regex(regex));
+        return regex_search(str, match, std::regex("^"+regex));
     }
 };
 
