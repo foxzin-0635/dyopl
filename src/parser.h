@@ -1,4 +1,5 @@
 #pragma once
+#include "ast.h"
 #include "lexer.h"
 
 class BaseParser {
@@ -10,6 +11,15 @@ public:
     BaseParser(vector<BaseToken*>& tokens): tokens(tokens), curTokenPos(0) {}
     virtual ~BaseParser() = default;
     
+    virtual vector<StatementNode> parse() {
+        vector<StatementNode> nodes;
+        
+        while (!check(BaseTokenType::EOF_)) {
+            nodes.push_back(parseStatement());
+        }
+        
+        return nodes;
+    }
 protected:
     class parser_exception {
     public:
@@ -66,7 +76,7 @@ protected:
         return tokens[curTokenPos];
     }
     
-    virtual bool check(BaseTokenType* type) {
+    virtual bool check(const BaseTokenType* type) {
         return tokens[curTokenPos]->getType() == type;
     }
     
@@ -74,7 +84,7 @@ protected:
         return regex_match(tokens[curTokenPos]->getLexeme(), ((icase) ? regex(lexeme, regex_constants::icase) : regex(lexeme)));
     }
     
-    virtual BaseToken* consume(BaseTokenType* type, const string& errorMessage) {
+    virtual BaseToken* consume(const BaseTokenType* type, const string& errorMessage) {
         if (check(type))
             return advance();
         
@@ -88,5 +98,11 @@ protected:
         throw new parser_exception("Token does not have the expected lexeme.", 1);
     }
     
-    virtual
+    virtual StatementNode parseStatement() {
+        throw new parser_exception("not implemented.", 1);
+    }
+    
+    virtual BaseExpressionNode* parseExpression() {
+        throw new parser_exception("not implemented.", 1);
+    }
 };
