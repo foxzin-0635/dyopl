@@ -12,20 +12,25 @@ public:
     virtual ~BaseParser() = default;
     
     virtual vector<StatementNode> parse() {
-        vector<StatementNode> nodes;
+        // TODO: Implement this code in your parsers.
+        /*vector<StatementNode> nodes;
         
         while (!check(BaseTokenType::EOF_)) {
             nodes.push_back(parseStatement());
         }
         
-        return nodes;
+        return nodes;*/
+        throw new parser_exception("not implemented.");
     }
 protected:
-    class parser_exception {
+    class parser_exception: exception {
+    private:
+        string str;
     public:
-        parser_exception(const char* msg, int errc) {
-            fprintf(stderr, "parser_exception: %s", msg);
-            exit(errc);
+        explicit parser_exception(const string& msg): str("parser_exception: "+msg) {}
+        
+        const char* what() const noexcept override {
+            return str.c_str();
         }
     };
     
@@ -88,21 +93,21 @@ protected:
         if (check(type))
             return advance();
         
-        throw new parser_exception("Token does not have the expected type.", 1);
+        throw new parser_exception("Token does not have the expected type.");
     }
     
     virtual BaseToken* consumeByLexeme(const string& lexeme, bool icase, const string& errorMessage) {
         if (checkByLexeme(lexeme, icase))
             return advance();
         
-        throw new parser_exception("Token does not have the expected lexeme.", 1);
+        throw new parser_exception("Token does not have the expected lexeme.");
     }
     
     virtual StatementNode parseStatement() {
-        throw new parser_exception("not implemented.", 1);
+        throw new parser_exception("not implemented.");
     }
     
     virtual BaseExpressionNode* parseExpression() {
-        throw new parser_exception("not implemented.", 1);
+        throw new parser_exception("not implemented.");
     }
 };
