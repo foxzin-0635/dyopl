@@ -1,4 +1,7 @@
 build.fmake
+build-windows.fmake
 src/test.cpp
 dyopl
 build.sh
+dyopl.exe
+fmake.exe
