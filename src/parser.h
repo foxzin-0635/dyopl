@@ -8,10 +8,10 @@ protected:
     size_t curTokenPos;
 public:
     BaseParser(): curTokenPos(0) {};
-    BaseParser(vector<BaseToken*>& tokens): tokens(tokens), curTokenPos(0) {}
+    BaseParser(const vector<BaseToken*>& tokens): tokens(tokens), curTokenPos(0) {}
     virtual ~BaseParser() = default;
     
-    virtual vector<StatementNode> parse() {
+    virtual vector<StatementNode*> parse() {
         // TODO: Implement this code in your parsers.
         /*vector<StatementNode> nodes;
         
@@ -42,7 +42,7 @@ protected:
     }
     
     virtual BaseToken* peekNext() {
-        if (curTokenPos + 1 >= tokens.size())
+        if (curTokenPos + 1 > tokens.size())
             return new BaseToken();
         
         return tokens[curTokenPos+1];
@@ -56,7 +56,7 @@ protected:
     }
     
     virtual BaseToken* peekWithOffset(size_t offset) {
-        if (curTokenPos + offset >= tokens.size())
+        if (curTokenPos + offset > tokens.size())
             return new BaseToken();
         if (curTokenPos + offset < 0)
             return new BaseToken();
@@ -65,14 +65,14 @@ protected:
     }
     
     virtual BaseToken* advance() {
-        if (curTokenPos + 1 >= tokens.size())
+        if (curTokenPos + 1 > tokens.size())
             return new BaseToken();
         
         return tokens[curTokenPos++];
     }
     
     virtual BaseToken* advanceNTimes(size_t n) {
-        if (curTokenPos + n >= tokens.size())
+        if (curTokenPos + n > tokens.size())
             return new BaseToken();
         if (curTokenPos + n < 0)
             return new BaseToken();
@@ -82,28 +82,44 @@ protected:
     }
     
     virtual bool check(const BaseTokenType* type) {
-        return tokens[curTokenPos]->getType() == type;
+        BaseToken* token = peek();
+        bool isType = token->getType() == type;
+
+        if (token->getType() == BaseTokenType::EOF_) {
+            delete token;
+            token = nullptr;
+        }
+
+        return isType;
     }
     
     virtual bool checkByLexeme(const string& lexeme, bool icase) {
-        return regex_match(tokens[curTokenPos]->getLexeme(), ((icase) ? regex(lexeme, regex_constants::icase) : regex(lexeme)));
+        BaseToken* token = peek();
+        bool isLexeme = regex_match(token->getLexeme(), ((icase) ? regex(lexeme, regex_constants::icase) : regex(lexeme)));
+
+        if (token->getType() == BaseTokenType::EOF_) {
+            delete token;
+            token = nullptr;
+        }
+
+        return isLexeme;
     }
     
     virtual BaseToken* consume(const BaseTokenType* type, const string& errorMessage) {
         if (check(type))
             return advance();
         
-        throw new parser_exception("Token does not have the expected type.");
+        throw new parser_exception("consume(): "+errorMessage);
     }
     
     virtual BaseToken* consumeByLexeme(const string& lexeme, bool icase, const string& errorMessage) {
         if (checkByLexeme(lexeme, icase))
             return advance();
         
-        throw new parser_exception("Token does not have the expected lexeme.");
+        throw new parser_exception("consumeByLexeme(): "+errorMessage);
     }
     
-    virtual StatementNode parseStatement() {
+    virtual StatementNode* parseStatement() {
         throw new parser_exception("not implemented.");
     }
     

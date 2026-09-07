@@ -23,6 +23,8 @@ public:
     
     BaseTokenType(int16_t type): stored_type(type) {}
     virtual ~BaseTokenType() = default;
+
+    int16_t getStoredType() const { return stored_type; }
 };
 
 // Base config for all tokens.
@@ -98,8 +100,12 @@ public:
             new BaseTokenConfig(BaseTokenType::IDENTIFIER, "[a-zA-Z_][a-zA-Z0-9_]*")
         };
     }
-    BaseLexer(vector<BaseTokenConfig*> tconf, bool ignoreWhitespaces): tconf(tconf), ignoreWhitespaces(ignoreWhitespaces) {}
-    
+    BaseLexer(const vector<BaseTokenConfig*>& tconf, bool ignoreWhitespaces): tconf(tconf), ignoreWhitespaces(ignoreWhitespaces) {}
+    virtual ~BaseLexer() {
+        for (auto c : tconf) { delete c; }
+        tconf.clear();
+    }
+
     virtual void setIgnoreWhitespaces(bool value) { ignoreWhitespaces = value; }
     
     virtual vector<BaseToken*> tokenize(const string& source) {

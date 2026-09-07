@@ -2,6 +2,7 @@
 #include <cstddef>
 #include <functional>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -23,9 +24,13 @@ public:
 
 // Base class for StatementResult<T>.
 class BaseStatementResult {
+protected:
+    bool failed;
 public:
     BaseStatementResult() = default;
     virtual ~BaseStatementResult() = default;
+
+    virtual bool& fail() { return failed; }
 };
 
 // Base class for StatementArg<T>.
@@ -43,7 +48,7 @@ protected:
 public:
     StatementArg(T& value): BaseStatementArg(), value(value) {}
     
-    virtual T& getValue() const { return value; }
+    virtual T& getValue() { return value; }
 };
 
 // Holds the result for StatementNodes.
@@ -51,12 +56,10 @@ template<typename T>
 class StatementResult : public BaseStatementResult {
 protected:
     T value;
-    bool failed;
 public:
     StatementResult(T& value): BaseStatementResult(), value(value) {}
     
     virtual T& getValue() { return value; }
-    virtual bool& fail() { return failed; }
 };
 
 // The statements node.
@@ -65,7 +68,7 @@ protected:
     function<BaseStatementResult*(vector<BaseStatementArg*>)> logic;
 public:
     StatementNode(): ASTNode(), logic([](vector<BaseStatementArg*> args) {StatementResult<const string&>* v = new StatementResult<const string&>("not implemented."); v->fail() = true; return v;}) {}
-    StatementNode(function<BaseStatementResult*(vector<BaseStatementArg*>)>& logic, size_t start, size_t end): ASTNode(start, end), logic(logic) {}
+    StatementNode(const function<BaseStatementResult*(vector<BaseStatementArg*>)>& logic, size_t start, size_t end): ASTNode(start, end), logic(logic) {}
     virtual ~StatementNode() = default;
     
     virtual BaseStatementResult* run(vector<BaseStatementArg*> args) { return logic(args); }
