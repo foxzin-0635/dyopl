@@ -3,8 +3,13 @@
 #include <functional>
 #include <vector>
 #include <string>
+#include "semantic_analyzer.h"
 
 using namespace std;
+
+template<typename T>
+class BaseASTVisitor;
+struct BaseSemanticType;
 
 // Base node
 class ASTNode {
@@ -66,12 +71,19 @@ public:
 class StatementNode : public ASTNode {
 protected:
     function<BaseStatementResult*(vector<BaseStatementArg*>)> logic;
+
+    friend class BaseASTVisitor<const BaseSemanticType*>;
 public:
     StatementNode(): ASTNode(), logic([](vector<BaseStatementArg*> args) {StatementResult<const string&>* v = new StatementResult<const string&>("not implemented."); v->fail() = true; return v;}) {}
     StatementNode(const function<BaseStatementResult*(vector<BaseStatementArg*>)>& logic, size_t start, size_t end): ASTNode(start, end), logic(logic) {}
     virtual ~StatementNode() = default;
     
     virtual BaseStatementResult* run(vector<BaseStatementArg*> args) { return logic(args); }
+    
+    template<typename T = const BaseSemanticType*>
+    T accept(BaseASTVisitor<T>* visitor) {
+        return visitor->visit(this);
+    }
 };
 
 // Base class for ExpressionNode<T>.
