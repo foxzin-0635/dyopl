@@ -3,13 +3,10 @@
 #include <functional>
 #include <vector>
 #include <string>
-#include "semantic_analyzer.h"
+
+#include "astsemantic.h"
 
 using namespace std;
-
-template<typename T>
-class BaseASTVisitor;
-struct BaseSemanticType;
 
 // Base node
 class ASTNode {

@@ -1,12 +1,11 @@
 #pragma once
-#include "ast.h"
 #include <unordered_map>
 #include <map>
 #include <string>
 #include <vector>
 #include <cstdint>
 
-class StatementNode;
+#include "astsemantic.h"
 
 struct BaseSemanticType {
 protected:

@@ -52,7 +52,7 @@ protected:
     BaseOpcodeArgConfig* argConfig;
 public:
     BaseOpcodeConfig(): mnemonic(""), argConfig() {}
-    BaseOpcodeConfig(const string& mnemonic, BaseOpcodeArgConfig*& argConfig): mnemonic(mnemonic), argConfig(argConfig) {}
+    BaseOpcodeConfig(const string& mnemonic, BaseOpcodeArgConfig* argConfig): mnemonic(mnemonic), argConfig(argConfig) {}
     virtual ~BaseOpcodeConfig() {
         delete argConfig;
         argConfig = nullptr;
@@ -95,7 +95,7 @@ protected:
     string instructionCode;
 public:
     BaseParsedOpcode(): config() {}
-    BaseParsedOpcode(BaseOpcodeConfig*& config, const string& instructionCode, const vector<BaseParsedOpcodeArg*>& args): config(config), instructionCode(instructionCode), args(args) {}
+    BaseParsedOpcode(BaseOpcodeConfig* config, const string& instructionCode, const vector<BaseParsedOpcodeArg*>& args): config(config), instructionCode(instructionCode), args(args) {}
     virtual ~BaseParsedOpcode() {
         delete config;
         config = nullptr;
